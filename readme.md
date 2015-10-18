@@ -1,27 +1,109 @@
-## Laravel PHP Framework
+# A simple Blog Api implemented with Laravel 5.0 
+This Repo is Only For my Resume!! 
 
-[![Build Status](https://travis-ci.org/laravel/framework.svg)](https://travis-ci.org/laravel/framework)
-[![Total Downloads](https://poser.pugx.org/laravel/framework/d/total.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Stable Version](https://poser.pugx.org/laravel/framework/v/stable.svg)](https://packagist.org/packages/laravel/framework)
-[![Latest Unstable Version](https://poser.pugx.org/laravel/framework/v/unstable.svg)](https://packagist.org/packages/laravel/framework)
-[![License](https://poser.pugx.org/laravel/framework/license.svg)](https://packagist.org/packages/laravel/framework)
+## Features
+- using (webpatser/laravel-uuid) to create uuid for posts table
+- using Html Purifier (mews/purifier) to sanitize and clean input data (security and xss)
+- All input and output data are Json.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable, creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as authentication, routing, sessions, queueing, and caching.
+## Api Routes
+- Route: api/v1/blog/ =>  Responses all posts as json 
+- Route: api/v1/blog/show  => Outputs One or Array of posts for given uuid's
+- Route: api/v1/blog/add  => Inserts One or Array of given Posts into database
+- Route: api/v1/blog/update => Updates One or Array of Posts
+- Route: api/v1/blog/delete => Deletes One or Array  of given uuids from database
 
-Laravel is accessible, yet powerful, providing powerful tools needed for large, robust applications. A superb inversion of control container, expressive migration system, and tightly integrated unit testing support give you the tools you need to build any application with which you are tasked.
 
-## Official Documentation
+## Installation
 
-Documentation for the framework can be found on the [Laravel website](http://laravel.com/docs).
+- Clone or Download Repo
+- To install dependencies: composer install
+- To create tables : php artisan migrate
+- To seed tables : php artisan db:seed
 
-## Contributing
+## Usage
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](http://laravel.com/docs/contributions).
+#### Route: api/v1/blog :
+With GET request simply type the url in browser and all posts are returned as Json.
 
-## Security Vulnerabilities
+#### Route: api/v1/blog/show
+POST uuids in Json format to this route and it will return all the posts with the provided uuids.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell at taylor@laravel.com. All security vulnerabilities will be promptly addressed.
+###### The Json format should be like following: 
+
+<p>&nbsp;{<br />
+&nbsp; &nbsp; &nbsp;&quot;uuids&quot;:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; [<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &quot;2019aa37-1aae-40d3-9b7a-c8c77bc56bef&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &quot;3a1b86b6-aea9-44fe-9ffd-a9e9add0bf95&quot;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;]</p>
+<p>}</p>
+
+
+#### Route:  api/v1/blog/add
+POST (Data that you want to save to database) to this route as Json and it will insert these data to database.
+
+###### The Json format should be like following: 
+
+<p>&nbsp;{<br />
+&nbsp; &nbsp; &nbsp;&quot;data&quot;:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; { &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;title&quot;:&quot;title1&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;body&quot;: &quot;post 1 body!&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;slug&quot;: &quot;slug&quot;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; },<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {&nbsp; &nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;title&quot;:&quot;title2&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;body&quot;: &quot;post 2 body!&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;slug&quot;: &quot;slug2&quot;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; ]<br />
+&nbsp; &nbsp; }</p>
+
+
+#### Route:  api/v1/blog/update
+In order to update some posts you should POST a Json data that includes uuid and other attributes for posts table.
+
+##### The Json format should be like this: 
+
+<p>&nbsp;{<br />
+&nbsp; &nbsp; &nbsp;&quot;data&quot;:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; { &nbsp;</p>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;id&quot;:&quot;1050fee5-fc3c-4ec9-9e4f-69a3adf801bb&quot;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;title&quot;:&quot;title1&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;body&quot;: &quot;post 1 body!&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;slug&quot;: &quot;slug&quot;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; },<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; {&nbsp;</p>
+
+<p>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;id&quot;:&quot;255e7eeb-142e-4777-b54c-503be090820e&quot;&nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;title&quot;:&quot;title2&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;body&quot;: &quot;post 2 body!&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&quot;slug&quot;: &quot;slug2&quot;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; }<br />
+&nbsp; &nbsp; &nbsp; &nbsp; ]<br />
+&nbsp; &nbsp; }</p>
+
+#### Route:  api/v1/blog/delete 
+POST uuids Json to this route and all the uuids provided will be deleted from database.
+
+##### The Json File should be like following:
+
+<p><br />
+&nbsp;{<br />
+&nbsp; &nbsp; &nbsp;&quot;uuids&quot;:<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;[<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &quot;2011e883-3ac7-41c9-afdc-facd3fc879ba&quot;,<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &quot;27bd977d-f3da-4fb6-b862-815d44233f48&quot;&nbsp;&nbsp;<br />
+&nbsp; &nbsp; &nbsp; &nbsp; &nbsp;]</p>
+
+<p>}</p>
+
 
 ### License
+<a href="https://github.com/ellipsesynergie/api-response/blob/master/LICENSE">MIT</a> License.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
+
