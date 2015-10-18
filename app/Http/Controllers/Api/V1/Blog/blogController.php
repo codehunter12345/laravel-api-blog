@@ -153,11 +153,10 @@ class blogController extends ApiController {
                 return $this->respondInvalid($validator->errors()->all());
             }
 
-
-            if(!DB::table('posts')->where('id', $data['id'])->update($data)){
-                $notUpdated_rows[]=$data['title'];
+            if(DB::table('posts')->where('id', $data['id'])->update(clean($data))){
+                $updated_rows[]=$data['title'];
             }else{
-                $updated_rows[]= $data['title'];
+                $notUpdated_rows[]= $data['title'];
             }
 
             }

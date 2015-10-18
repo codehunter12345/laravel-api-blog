@@ -24,7 +24,10 @@ return [
     'settings'  => [
         'default' => [
             'HTML.Doctype'             => 'XHTML 1.0 Strict',
-            'HTML.Allowed'             => 'div,b,strong,i,em,a[href|title],ul,ol,li,p[style],br,span[style],img[width|height|alt|src]',
+            'HTML.Allowed'             => 'h1[style],h2[style],h3[style],h4[style],h5[style],
+                                            div[style],b,strong,i,em,a[style|href|title],
+                                            ul[style],ol[style],li[style],p[style],br,span[style],
+                                            img[width|height|alt|src]',
             'CSS.AllowedProperties'    => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align',
             'AutoFormat.AutoParagraph' => false,
             'AutoFormat.RemoveEmpty'   => true,
