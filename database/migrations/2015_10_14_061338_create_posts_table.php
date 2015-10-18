@@ -17,14 +17,14 @@ class CreatePostsTable extends Migration {
             $table->char('id', 36);
 			$table->primary('id');
 			$table->index('id');
-            $table -> integer('author_id')-> unsigned()-> default(0)  ;
+            $table -> integer('author_id')-> unsigned()-> default(1)  ;
             $table->foreign('author_id')
              ->references('id')->on('users')
              ->onDelete('cascade');
             $table->string('title')->unique();
             $table->text('body');
             $table->string('slug')->unique();
-            $table->boolean('active');
+            $table->boolean('active')-> default(true);
             $table->timestamps();
 		});
 	}

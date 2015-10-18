@@ -19,3 +19,16 @@ Route::controllers([
 	'auth' => 'Auth\AuthController',
 	'password' => 'Auth\PasswordController',
 ]);
+
+
+Route::group(['prefix'=>'api/v1/blog','namespace'=>'Api\V1\Blog'],function(){
+
+
+		Route::get('/', 	'blogController@index');
+		Route::post('show', 'blogController@show');
+		Route::post('add', 	'blogController@add');
+		Route::post('update', 'blogController@update');
+		Route::post('delete', 'blogController@delete');
+
+});
+
