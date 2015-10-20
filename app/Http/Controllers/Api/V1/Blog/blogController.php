@@ -1,45 +1,69 @@
 <?php namespace App\Http\Controllers\Api\V1\Blog;
 
-use App\Http\Controllers\Api\ApiController;
-use App\Posts;
-use Illuminate\Support\Facades\Input;
-use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use DB;
+use Input;
+use App\Repos\Post\PostInterface as Post;
+use App\Repos\Response\ResponseInterface as Response;
+use App\Repos\Validator\ValidatorInterface as Validator;
 
-class blogController extends ApiController {
 
-    public function index(){
+class blogController extends Controller
+{
 
-        $posts = Posts::all();
+    protected $posts;
 
-        return response()->json([
-            "data"=> $posts->toArray(),
-            "massage"=>"data successfully retrieved from database!"
-        ],200);
+    protected $response;
 
+    protected $request;
+
+    protected $validator;
+
+
+    public function __construct(
+        Post $post,
+        Response $response,
+        Request $request,
+        Validator $validator
+    ){
+        $this->posts = $post;
+        $this->response = $response;
+        $this->request = $request;
+        $this->validator = $validator;
+        $this->middleware('htmlPurify');
     }
 
 
-    public function show(){
+    public function index()
+    {
+        $limit = Input::get('limit') ? : 3;
 
-        if(array_key_exists("uuids",Input::all())){
+        $posts = $this->posts->paginate($limit);
 
-            $uuids = Input::all()['uuids'];
+        return $this->response->respondOk($posts->toArray());
+    }
 
-        }else{
 
-            return $this->respondBadRequest("Syntax error!");
+    public function show()
+    {
+        $input = $this->request->all();
+
+        if(!array_key_exists("uuids", $input)) {
+            return $this->response->respondBadRequest();
         }
 
-        $posts = Posts::find($uuids);
 
-        if(!($posts->toArray())){
-            return $this->respondNotFound("uuid Not Found!");
+        $uuids = $input['uuids'];
+
+        $posts = $this->posts->find($uuids)->toArray();
+
+
+        if(!$posts) {
+            return $this->response->respondNotFound();
         }
 
-        return response()->json([
-            'data'=> $posts->toArray()
-        ],200);
+        return $this->response->respondOk($posts);
 
     }
 
@@ -47,44 +71,39 @@ class blogController extends ApiController {
 
     public function add()
     {
-
-        $rules = [
-            "title" => "required|unique:posts",
-            "body"  => "required",
-            "slug"  => "unique:posts",
-        ];
+        $datas = $this->request->all();
 
 
-        if(!array_key_exists("data",Input::all())){
-            return $this->respondBadRequest("Syntax error! 'data' attribute not found.");
+        if(!array_key_exists("data", $datas)) {
+            return $this->response->respondBadRequest();
         }
 
-        $datas = Input::all()['data'];
+        $datas = $datas['data'];
 
-        if(!$datas){
-            return $this->respondBadRequest("Syntax error! OR No data");
+        if(!$datas) {
+            return $this->response->respondNotFound();
         }
 
 
-        $notAdded_data=[];
+        $notAdded_data = [];
         $i = 0;
 
         foreach ($datas as $data) {
 
             $i++;
 
-            $validator = Validator::make($data, $rules);
+            $validator = $this->validator->validateAdd($data);
 
             if (!$validator->passes()) {
                 $notAdded_data['data'.$i]=$data;
                 $notAdded_data["error".$i]=$validator->errors()->all();
-            }else{
-                Posts::create(clean($data));
+            } else {
+                $this->posts->create($data);
             }
 
-        }
+         }
 
-        return $this->respondAdded($notAdded_data);
+        return $this->response->respondAdded($notAdded_data);
     }
 
 
@@ -92,76 +111,82 @@ class blogController extends ApiController {
 
     public function delete(){
 
-        if(!array_key_exists("uuids",Input::all())) {
-            return $this->respondBadRequest("Syntax error! OR 'uuid' attribute not found.");
+        $input = $this->request->all();
+
+        if(!array_key_exists("uuids", $input)) {
+            return $this->response->respondBadRequest();
         }
 
-        $uuids = Input::all()['uuids'];
-        $posts = Posts::find($uuids);
-//        dd($posts);
-        if(!($posts->toArray())){
-            return $this->respondNotFound("Provided uuid Not found in database!");
+
+        $uuids = $input['uuids'];
+
+
+        if(!$this->posts->find($uuids)->toArray()) {
+            return $this->response->respondNotFound();
         }
 
-        $deleted_uuid=[];
-        $notDeleted_uuid=[];
+
+        $deleted_uuid = [];
+
+        $notDeleted_uuid = [];
+
 
         foreach ($uuids as $uuid) {
 
-            if(DB::table('posts')->where('id',$uuid)->delete()){
-                $deleted_uuid[]=$uuid;
-            }else{
-                $notDeleted_uuid[]=$uuid;
+            if(DB::table('posts')->where('id', $uuid)->delete()) {
+                $deleted_uuid[] = $uuid;
+            } else {
+                $notDeleted_uuid[] = $uuid;
             }
         }
 
-        return $this->respondDeleted($deleted_uuid,$notDeleted_uuid);
+        return $this->response->respondDeleted($deleted_uuid, $notDeleted_uuid);
 
     }
 
 
+
     public function update()
     {
-
-        $rules = [
-            'title' => 'required|unique:posts,id',
-            "body"  => "required",
-            "id"  => "required",
-        ];
-
-        $datas = Input::all();
+        $datas = $this->request->all();
 
 
-        if(!array_key_exists("data",$datas)) {
-            return $this->respondBadRequest("Syntax error! OR 'uuid' attribute not found.");
+        if(!array_key_exists("data", $datas)) {
+            return $this->response->respondBadRequest();
         }
 
         $datas = $datas['data'];
 
-        if(!$datas){
-            return $this->respondNotFound("No Data Recieved!");
+
+        if(!$datas) {
+            return $this->response->respondNotFound();
         }
 
-        $notUpdated_rows=[];
-        $updated_rows=[];
 
-        foreach ($datas as $data) {
+        $notUpdated_rows = [];
 
-            $validator = Validator::make($data, $rules);
+        $updated_rows = [];
+
+
+        foreach ($datas as $data)
+        {
+            $validator = $this->validator->validateUpdate($data);
 
             if (!$validator->passes()) {
-                return $this->respondInvalid($validator->errors()->all());
+                return $this->response->respondInvalid($validator->errors()->all());
             }
 
-            if(DB::table('posts')->where('id', $data['id'])->update(clean($data))){
-                $updated_rows[]=$data['title'];
-            }else{
-                $notUpdated_rows[]= $data['title'];
-            }
 
+            if(DB::table('posts')->where('id', $data['id'])->update($data)) {
+                $updated_rows[] = $data['title'];
+            } else {
+                $notUpdated_rows[] = $data['title'];
             }
-        return $this->respondUpdated($updated_rows,$notUpdated_rows);
 
         }
+
+        return $this->response->respondUpdated($updated_rows, $notUpdated_rows);
+
+    }
 
 }

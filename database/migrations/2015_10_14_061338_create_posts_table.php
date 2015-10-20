@@ -21,7 +21,7 @@ class CreatePostsTable extends Migration {
             $table->foreign('author_id')
              ->references('id')->on('users')
              ->onDelete('cascade');
-            $table->string('title')->unique();
+            $table->string('title');
             $table->text('body');
             $table->string('slug')->unique();
             $table->boolean('active')-> default(true);

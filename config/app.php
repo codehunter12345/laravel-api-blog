@@ -52,7 +52,7 @@ return [
 	|
 	*/
 
-	'locale' => 'en',
+	'locale' => 'fa',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -145,6 +145,10 @@ return [
 		'App\Providers\EventServiceProvider',
 		'App\Providers\RouteServiceProvider',
 		'Mews\Purifier\PurifierServiceProvider',
+        /*
+         * My Service Providers...
+         */
+		'App\Repos\myServiceProvider',
 
 	],
 

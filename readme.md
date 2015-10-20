@@ -25,6 +25,8 @@ This Repo is Only For my Resume!!
 
 #### Route: api/v1/blog :
 With GET request simply type the url in browser and all posts are returned as Json.
+You can set `limit` parameter to url for number of records returned from api.
+You can move between pages by setting  `page` parameter in Url
 
 #### Route: api/v1/blog/show
 POST uuids in Json format to this route and it will return all the posts with the provided uuids.
